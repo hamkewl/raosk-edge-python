@@ -103,7 +103,7 @@ class MemoryModeler(Node):
 			- 2: NG
 	"""
 	def modeler_sub_callback(self, message):
-		#start = time.time()
+		start = time.time()
 		executor = ThreadPoolExecutor(max_workers = 2)
 		valid_flag = message.is_valid
 		if valid_flag <= 1:
@@ -142,7 +142,7 @@ class MemoryModeler(Node):
 
 		else:
 			raise ValueError
-		#end = time.time()
+		end = time.time()
 		self.get_logger().info('rap time: {:.4f}'.format(end - start))
 
 
