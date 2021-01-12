@@ -26,7 +26,7 @@ class MemoryModeler(Node):
 	NODENAME = 'mem_modeler'
 	PUBTOPIC = 'model_params'
 	SUBTOPIC = 'memproc_data'
-	r_INTERVAL = 90
+	r_INTERVAL = 30
 
 	## Instances
 	thread_list = []
@@ -127,7 +127,6 @@ class MemoryModeler(Node):
 				else:
 					self.mem_data_block = np.vstack( (self.mem_data_block, mem_data_arrival) )
 				
-				self.get_logger().info('mem_data_block: {}, valid_flag: {}'.format(len(self.mem_data_block), valid_flag))
 				if len(self.mem_data_block) >= self.r_INTERVAL or valid_flag == 1:
 	
 					dataframe = pd.DataFrame(self.mem_data_block)
@@ -139,11 +138,12 @@ class MemoryModeler(Node):
 
 					## Multiple regression model building
 					self.thread_list.append( executor.submit(self.regression_part, dataframe) )
-
 		else:
 			raise ValueError
 		end = time.time()
-		self.get_logger().info('rap time: {:.4f}'.format(end - start))
+		self.get_logger().info('mem_data_block: {}, valid_flag: {}, raptime: {:.4f}'.format(
+			len(self.mem_data_block), valid_flag, end - start)
+		)
 
 
 def main(args = None):
