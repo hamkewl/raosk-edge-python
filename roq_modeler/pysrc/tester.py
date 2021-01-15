@@ -11,7 +11,7 @@ import rclpy
 from rclpy.node import Node
 
 import random
-from roq_messrv.msg import MemProcMsg
+from roq_msgsrv.msg import MemProcMsg
 
 class MyPublisher(Node):
 	SELFNODE = "testpub"
@@ -36,10 +36,14 @@ class MyPublisher(Node):
 		msg.system = 60.5000 + random.uniform(0, 4.5000)
 		msg.buffer_sz = 308 + random.randint(-50, 50)
 		msg.cache_sz = 400 + random.randint(-50, 50)
+		msg.heap_sz = 1000 + random.randint(0, 200)
+		msg.stack_sz = 40 + random.randint(0, 40)
+		"""
 		msg.heap_bringup_sz = 1000 + random.randint(0, 200)
 		msg.heap_teleop_sz = 200 + random.randint(0, 50)
 		msg.stack_bringup_sz = 8
 		msg.stack_teleop_sz = 40
+		"""
 
 		self.pub.publish(msg)
 		self.count += 1

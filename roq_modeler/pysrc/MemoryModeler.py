@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 ## ROS2
 import rclpy
 from rclpy.node import Node
-from roq_messrv.msg import MemProcMsg, ModelParametersMsg	## Subscribe, Publish
+from roq_msgsrv.msg import MemProcMsg, MemParamsMsg	## Subscribe, Publish
 
 ## Debug Utilities
 import pprint
@@ -24,9 +24,9 @@ import traceback
 class MemoryModeler(Node):
 	## Node & Topic Name
 	NODENAME = 'mem_modeler'
-	PUBTOPIC = 'model_params'
+	PUBTOPIC = 'mem_params'
 	SUBTOPIC = 'memproc_data'
-	r_INTERVAL = 30
+	r_INTERVAL = 90
 
 	## Instances
 	thread_list = []
@@ -36,16 +36,21 @@ class MemoryModeler(Node):
 	#MID = -1
 	p_buffer = 0.00
 	p_cache = 0.00
+	p_heap = 0.00
+	p_stack = 0.00
+	"""
 	p_heap_bringup, p_heap_teleop = 0.00, 0.00
 	p_stack_bringup, p_stack_teleop = 0.00, 0.00
+	"""
 	p_intercept = 0.00
 	
 	## single robot version
 	elements_of_X = [
-		'buffer_szMB', \
-		'cache_szMB', \
-		'heap_bringup_szMB', 'heap_teleop_szMB', \
-		'stack_bringup_szMB', 'stack_teleop_szMB']
+		'buffer_szMB',
+		'cache_szMB',
+		'heap_szMB',	#'heap_bringup_szMB', 'heap_teleop_szMB', \		# 単一構成．単一ノードとして実装
+		'stack_szMB'	#'stack_bringup_szMB', 'stack_teleop_szMB'		# 単一構成・単一ノードとして実装
+  ]
 	element_of_Y = ['system_mem_per']
 	mem_data_block = np.empty(len(elements_of_X) + len(element_of_Y))
 	is_init = True
@@ -55,7 +60,7 @@ class MemoryModeler(Node):
 		self.get_logger().info('{} initializing...'.format(self.NODENAME))
 
 		## Create ROS2 instance
-		self.pub = self.create_publisher(ModelParametersMsg, self.PUBTOPIC, 10)
+		self.pub = self.create_publisher(MemParamsMsg, self.PUBTOPIC, 10)
 		self.timer = self.create_timer(1.00, self.modeler_pub_callback)
 		self.sub = self.create_subscription(MemProcMsg, self.SUBTOPIC, self.modeler_sub_callback, 10)
 	
@@ -75,19 +80,19 @@ class MemoryModeler(Node):
 		)
 		self.p_buffer = predict_params[0]
 		self.p_cache = predict_params[1]
-		self.p_heap_bringup, self.p_heap_teleop = predict_params[2], predict_params[3]
-		self.p_stack_bringup, self.p_stack_teleop = predict_params[4], predict_params[5]
+		self.p_heap = predict_params[2]
+		self.p_stack = predict_params[3]
 		self.p_intercept = clf.intercept_[0]
 
 	## callback function when publish message
 	def modeler_pub_callback(self):
 		## Message setting
-		msg = ModelParametersMsg()
+		msg = MemParamsMsg()
 		#msg.machine_id = self.MID
 		msg.p_buffer = self.p_buffer
 		msg.p_cache = self.p_cache
-		msg.p_heap_bringup, msg.p_heap_teleop	= self.p_heap_bringup, self.p_heap_teleop
-		msg.p_stack_bringup, msg.p_stack_teleop = self.p_stack_bringup, self.p_stack_teleop
+		msg.p_heap = self.p_heap
+		msg.p_stack = self.p_stack
 		msg.p_intercept = self.p_intercept
 
 		## Send message
@@ -113,8 +118,8 @@ class MemoryModeler(Node):
 					message.system,
 					message.buffer_sz,
 					message.cache_sz,
-					message.heap_bringup_sz, message.heap_teleop_sz,
-					message.stack_bringup_sz, message.stack_teleop_sz
+					message.heap_sz,
+					message.stack_sz
 				]
 			)
 			if not(len(mem_data_arrival) == len(self.elements_of_X) + len(self.element_of_Y)):
