@@ -13,18 +13,18 @@ import rclpy
 from rclpy.node import Node
 
 import random
-from roq_msgsrv.msg import MemProcMsg
+from roq_msgsrv.msg import NwProcMsg
 
-class MyPublisher(Node):
-	SELFNODE = "testpub"
-	SELFTOPIC = "memproc_data"
+class MyPublisherNw(Node):
+	SELFNODE = "testpub2"
+	SELFTOPIC = "nw_proc"
 	boundary = 0.025
 	vgid = os.getppid()
 
 	def __init__(self):
 		super().__init__(self.SELFNODE)
 		self.get_logger().info("{} initializing...".format((self.SELFNODE)))
-		self.pub = self.create_publisher(MemProcMsg, self.SELFTOPIC, 10)
+		self.pub = self.create_publisher(NwProcMsg, self.SELFTOPIC, 10)
 		self.create_timer(1.00, self.callback)
 		self.get_logger().info("{} do...".format(self.SELFNODE))
 		self.count = 0
@@ -33,11 +33,10 @@ class MyPublisher(Node):
 		self.get_logger().info("{} done.".format(self.SELFNODE))
 
 	def callback(self):
-		msg = MemProcMsg()
+		msg = NwProcMsg()
 
 		p = random.random()
 		self.count += 1
-		msg.vgid = self.vgid
 
 		if self.count >= 90 and p <= self.boundary or self.count >= 360:
 			msg.is_valid = 1
@@ -46,18 +45,10 @@ class MyPublisher(Node):
 		else:
 			msg.is_valid = 0
 		
-		msg.system = 60.5000 + random.uniform(0, 4.5000)
-		msg.buffer_sz = 308 + random.randint(-50, 50)
-		msg.cache_sz = 400 + random.randint(-50, 50)
-		msg.heap_sz = 1000 + random.randint(0, 200)
-		msg.stack_sz = 40 + random.randint(0, 40)
-		"""
-		msg.heap_bringup_sz = 1000 + random.randint(0, 200)
-		msg.heap_teleop_sz = 200 + random.randint(0, 50)
-		msg.stack_bringup_sz = 8
-		msg.stack_teleop_sz = 40
-		"""
-		self.get_logger().info("Publish [{:3d}] --> (is_valid = {}, p = {:.4f})".format(self.count, msg.is_valid, p))
+		msg.n_send = 1 + random.randint(0, 114514)
+		msg.n_receive = 1 + random.randint(0, 810)
+
+		self.get_logger().info("Publish [{:3d}] --> (is_valid = {}))".format(self.count, msg.is_valid))
 		self.pub.publish(msg)
 
 		if self.count >= 360 or self.count >= 90 and msg.is_valid == 1:
@@ -65,9 +56,9 @@ class MyPublisher(Node):
 			raise KeyboardInterrupt
 
 def main(args = None):
+	rclpy.init(args = args)
+	node = MyPublisherNw()
 	try:
-		rclpy.init(args = args)
-		node = MyPublisher()
 		rclpy.spin(node)
 	except KeyboardInterrupt:
 		pass

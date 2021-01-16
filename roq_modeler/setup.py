@@ -35,8 +35,10 @@ setup(
 	tests_require = ['pytest'],
 	entry_points = {
 		'console_scripts': [
+			'w_model = pysrc.NetworkModeler:main',
 			'm_model = pysrc.MemoryModeler:main',
-			'tester = pysrc.tester:main',
+			'tester1 = pysrc.tester_mem:main',
+			'tester2 = pysrc.tester_nw:main',
 		],
 	},
 )

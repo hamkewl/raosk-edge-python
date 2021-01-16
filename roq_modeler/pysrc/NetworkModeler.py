@@ -1,14 +1,12 @@
 # =============================
 # NetworkModeler.py
-# @discription	Modeling of acquired data and sending/receiving via ROS2
+# @discription	Modeling of acquired network data and sending/receiving via ROS2
 # @Author	Koki Nagahama (@hamstick)
 # =============================
 
 ## Regression Kit
 import time
 import numpy as np
-import pandas as pd
-from concurrent.futures import ThreadPoolExecutor
 
 ## ROS2
 import rclpy
@@ -27,22 +25,21 @@ class NetworkModeler(Node):
 	r_INTERVAL = 90
 
 	## Instances
-	thread_list = []
+	#thread_list = []
 	#executor = ThreadPoolExecutor(max_workers = 8)
 
 	## Model Parameters
 	#MID = -1
-	p_send = 0.00
-	p_receive = 0.00
-	p_intercept = 0.00
+	p_ave_send = 0.00
+	p_ave_receive = 0.00
 	
 	## single robot version
 	elements_of_X = [
 		'n_send',
 		'n_receive'
   ]
-	#element_of_Y = ['n_load']
-	#mem_data_block = np.empty(len(elements_of_X) + len(element_of_Y))
+	element_of_Y = ['n_load']
+	nw_data_tuple = np.empty(len(elements_of_X))
 	is_init = True
 
 	def __init__(self):
@@ -58,37 +55,19 @@ class NetworkModeler(Node):
 		self.get_logger().info("{} done.".format(self.NODENAME))
 
 	## Create model
-	def create_model(self, ndarray):
-		
-
-
-	"""
-	def regression_part(self, dataframe):
-		#self.get_logger().info('into REG')
-		#clf = linear_model.LinearRegression()
-		#clf.fit(dataframe[self.elements_of_X], dataframe[self.element_of_Y])
-
-		## Setting message value
-		predict_params = clf.coef_[0]
-		self.get_logger().info('--> predict_params: {}'.format(
-			np.round(np.append(clf.coef_[0], clf.intercept_), decimals = 4))
-		)
-		self.p_send = predict_params[0]
-		self.p_receive = predict_params[1]
-		#self.p_heap = predict_params[2]
-		#self.p_stack = predict_params[3]
-		self.p_intercept = clf.intercept_[0]
-		self.get_logger().info('--> clf.score: {:.4f}'.format(
-			clf.score(dataframe[self.elements_of_X], dataframe[self.element_of_Y[0]])
+	def create_params(self, ndarray):
+		self.p_ave_send = np.mean(ndarray[:][0])
+		self.p_ave_receive = np.mean(ndarray[:][1])
+		self.get_logger().info('create_params:  p_ave_send: {:.4f},  p_ave_receive: {:.4f}'.format(
+			self.p_ave_send, self.p_ave_receive
 		))
-	"""
-
+	
 	## callback function when publish message
 	def modeler_pub_callback(self):
 		## Message setting
 		msg = NwParamsMsg()
-		#msg.machine_id = self.MID
-
+		msg.p_ave_send = self.p_ave_send
+		msg.p_ave_receive = self.p_ave_receive
 
 		## Send message
 		self.pub.publish(msg)
@@ -104,62 +83,59 @@ class NetworkModeler(Node):
 	"""
 	def modeler_sub_callback(self, message):
 		start = time.time()
-		executor = ThreadPoolExecutor(max_workers = 2)
-		self.p_vgid = message.vgid
 		valid_flag = message.is_valid
 
 		if valid_flag <= 1:
-			#self.MID = message.machine_id
-			mem_data_arrival = np.array(
+			nw_data_arrival = np.array(
 				[
-					message.system,
-					message.buffer_sz,
-					message.cache_sz,
-					message.heap_sz,
-					message.stack_sz
+					message.n_send,
+					message.n_receive
 				]
 			)
-			if not(len(mem_data_arrival) == len(self.elements_of_X) + len(self.element_of_Y)):
+			if not(len(nw_data_arrival) == len(self.elements_of_X)):
 				raise ValueError
 			else:
 				if self.is_init == True:
-					self.mem_data_block = np.vstack( (self.mem_data_block, mem_data_arrival) )
-					self.mem_data_block = np.delete(self.mem_data_block, 0, axis = 0)
+					self.nw_data_tuple = np.vstack( (self.nw_data_tuple, nw_data_arrival) )
+					self.nw_data_tuple = np.delete(self.nw_data_tuple, 0, axis = 0)
 					self.is_init = False
 				else:
-					self.mem_data_block = np.vstack( (self.mem_data_block, mem_data_arrival) )
+					self.nw_data_tuple = np.vstack( (self.nw_data_tuple, nw_data_arrival) )
 
 				## r_INTERVAL個データが集まったら
-				## またはvalid_flagが1のときに最低限パラメータ数の10倍以上データがあったら重回帰
-				if len(self.mem_data_block) >= self.r_INTERVAL \
-					or valid_flag == 1 and len(self.mem_data_block) >= (len(self.elements_of_X) * 10):
+				## またはvalid_flagが1のときに最低限パラメータ数の10倍以上データがあったらモデル化実行
+				if len(self.nw_data_tuple) >= self.r_INTERVAL \
+					or valid_flag == 1 and len(self.nw_data_tuple) >= (len(self.elements_of_X) * 10):
 
-					dataframe = pd.DataFrame(self.mem_data_block)
+					"""
+					dataframe = pd.DataFrame(self.nw_data_tuple)
 					dataframe.columns = self.element_of_Y + self.elements_of_X
+					"""
 
-					## Reinitialize mem_data_block
-					self.mem_data_block = np.empty(len(self.elements_of_X) + len(self.element_of_Y))
+					## Reinitialize nw_data_tuple
+					ndarray = self.nw_data_tuple
+					self.nw_data_tuple = np.empty(len(self.elements_of_X))
 					self.is_init = True
+
 					## Multiple regression model building
-					self.thread_list.append( executor.submit(self.regression_part, dataframe) )
+					self.create_params(ndarray)
 				
 				# else
 				elif valid_flag == 1:
-					self.get_logger().warn('Executing CLF skipped.. (self.mem_data_block: {})'.format(len(self.mem_data_block)))
+					self.get_logger().warn('Executing Modeling skipped.. (self.nw_data_tuple: {})'.format(len(self.nw_data_tuple)))
 
 		else:
 			self.get_logger().warn('Invalid data received.')
-			#raise ValueError
 		
 		end = time.time()
-		self.get_logger().info('mem_data_block: {:2d}, valid_flag: {}, raptime: {:.4f}'.format(
-			len(self.mem_data_block), valid_flag, end - start)
+		self.get_logger().info('nw_data_tuple: {:2d}, valid_flag: {}, raptime: {:.4f}'.format(
+			len(self.nw_data_tuple), valid_flag, end - start)
 		)
 
 
 def main(args = None):
 	rclpy.init(args = args)
-	node = MemoryModeler()
+	node = NetworkModeler()
 	try:
 		rclpy.spin(node)
 	except KeyboardInterrupt:

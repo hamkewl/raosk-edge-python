@@ -1,6 +1,6 @@
 # =============================
 # MemoryModeler.py
-# @discription	Modeling of acquired data and sending/receiving via ROS2
+# @discription	Modeling of acquired memory data and sending/receiving via ROS2
 # @Author	Koki Nagahama (@hamstick)
 # =============================
 
@@ -25,8 +25,8 @@ class MemoryModeler(Node):
 	## Node & Topic Name
 	NODENAME = 'mem_modeler'
 	PUBTOPIC = 'mem_params'
-	SUBTOPIC = 'memproc_data'
-	r_INTERVAL = 90
+	SUBTOPIC = 'mem_proc'
+	r_INTERVAL = 40
 
 	## Instances
 	thread_list = []
