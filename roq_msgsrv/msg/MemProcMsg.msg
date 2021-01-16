@@ -1,3 +1,4 @@
+int32 vgid
 int32 is_valid
 float32 system
 int32 buffer_sz

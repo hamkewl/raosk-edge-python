@@ -34,21 +34,18 @@ class MemoryModeler(Node):
 
 	## Model Parameters
 	#MID = -1
+	p_vgid = 0
 	p_buffer = 0.00
 	p_cache = 0.00
 	p_heap = 0.00
 	p_stack = 0.00
-	"""
-	p_heap_bringup, p_heap_teleop = 0.00, 0.00
-	p_stack_bringup, p_stack_teleop = 0.00, 0.00
-	"""
 	p_intercept = 0.00
 	
 	## single robot version
 	elements_of_X = [
 		'buffer_szMB',
 		'cache_szMB',
-		'heap_szMB',	#'heap_bringup_szMB', 'heap_teleop_szMB', \		# 単一構成．単一ノードとして実装
+		'heap_szMB',	#'heap_bringup_szMB', 'heap_teleop_szMB', 		# 単一構成．単一ノードとして実装
 		'stack_szMB'	#'stack_bringup_szMB', 'stack_teleop_szMB'		# 単一構成・単一ノードとして実装
   ]
 	element_of_Y = ['system_mem_per']
@@ -65,7 +62,7 @@ class MemoryModeler(Node):
 		self.sub = self.create_subscription(MemProcMsg, self.SUBTOPIC, self.modeler_sub_callback, 10)
 	
 	def __del__(self):
-		self.get_logger().info("%s done." % self.NODENAME)
+		self.get_logger().info("{} done.".format(self.NODENAME))
 
 	## Multi Linear Regression @Multi-Threading
 	def regression_part(self, dataframe):
@@ -83,12 +80,16 @@ class MemoryModeler(Node):
 		self.p_heap = predict_params[2]
 		self.p_stack = predict_params[3]
 		self.p_intercept = clf.intercept_[0]
+		self.get_logger().info('--> clf.score: {:.4f}'.format(
+			clf.score(dataframe[self.elements_of_X], dataframe[self.element_of_Y[0]])
+		))
 
 	## callback function when publish message
 	def modeler_pub_callback(self):
 		## Message setting
 		msg = MemParamsMsg()
 		#msg.machine_id = self.MID
+		msg.vgid = self.p_vgid
 		msg.p_buffer = self.p_buffer
 		msg.p_cache = self.p_cache
 		msg.p_heap = self.p_heap
@@ -110,7 +111,9 @@ class MemoryModeler(Node):
 	def modeler_sub_callback(self, message):
 		start = time.time()
 		executor = ThreadPoolExecutor(max_workers = 2)
+		self.p_vgid = message.vgid
 		valid_flag = message.is_valid
+
 		if valid_flag <= 1:
 			#self.MID = message.machine_id
 			mem_data_arrival = np.array(
@@ -131,22 +134,31 @@ class MemoryModeler(Node):
 					self.is_init = False
 				else:
 					self.mem_data_block = np.vstack( (self.mem_data_block, mem_data_arrival) )
-				
-				if len(self.mem_data_block) >= self.r_INTERVAL or valid_flag == 1:
-	
+
+				## r_INTERVAL個データが集まったら
+				## またはvalid_flagが1のときに最低限パラメータ数の10倍以上データがあったら重回帰
+				if len(self.mem_data_block) >= self.r_INTERVAL \
+					or valid_flag == 1 and len(self.mem_data_block) >= (len(self.elements_of_X) * 10):
+
 					dataframe = pd.DataFrame(self.mem_data_block)
 					dataframe.columns = self.element_of_Y + self.elements_of_X
 
 					## Reinitialize mem_data_block
 					self.mem_data_block = np.empty(len(self.elements_of_X) + len(self.element_of_Y))
 					self.is_init = True
-
 					## Multiple regression model building
 					self.thread_list.append( executor.submit(self.regression_part, dataframe) )
+				
+				# else
+				elif valid_flag == 1:
+					self.get_logger().warn('Executing CLF skipped.. (self.mem_data_block: {})'.format(len(self.mem_data_block)))
+
 		else:
-			raise ValueError
+			self.get_logger().warn('Invalid data received.')
+			#raise ValueError
+		
 		end = time.time()
-		self.get_logger().info('mem_data_block: {}, valid_flag: {}, raptime: {:.4f}'.format(
+		self.get_logger().info('mem_data_block: {:2d}, valid_flag: {}, raptime: {:.4f}'.format(
 			len(self.mem_data_block), valid_flag, end - start)
 		)
 

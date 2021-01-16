@@ -7,6 +7,8 @@
 # Copyright (C) 2019 myasu.
 # -----------------------------------------------
 
+import os
+
 import rclpy
 from rclpy.node import Node
 
@@ -16,23 +18,34 @@ from roq_msgsrv.msg import MemProcMsg
 class MyPublisher(Node):
 	SELFNODE = "testpub"
 	SELFTOPIC = "memproc_data"
+	boundary = 0.025
+	vgid = os.getppid()
 
 	def __init__(self):
 		super().__init__(self.SELFNODE)
-		self.get_logger().info("%s initializing..." % (self.SELFNODE))
+		self.get_logger().info("{} initializing...".format((self.SELFNODE)))
 		self.pub = self.create_publisher(MemProcMsg, self.SELFTOPIC, 10)
 		self.create_timer(1.00, self.callback)
-		self.get_logger().info("%s do..." % self.SELFNODE)
-		self.count = 1
+		self.get_logger().info("{} do...".format(self.SELFNODE))
+		self.count = 0
 
 	def __del__(self):
-		self.get_logger().info("%s done." % self.SELFNODE)
+		self.get_logger().info("{} done.".format(self.SELFNODE))
 
 	def callback(self):
-		self.get_logger().info("Publish [%s]" % (self.count))
 		msg = MemProcMsg()
+
+		p = random.random()
+		self.count += 1
+		msg.vgid = self.vgid
+
+		if self.count >= 90 and p <= self.boundary or self.count >= 360:
+			msg.is_valid = 1
+		elif (1. - self.boundary) <= p:
+			msg.is_valid = 2
+		else:
+			msg.is_valid = 0
 		
-		msg.is_valid = 0
 		msg.system = 60.5000 + random.uniform(0, 4.5000)
 		msg.buffer_sz = 308 + random.randint(-50, 50)
 		msg.cache_sz = 400 + random.randint(-50, 50)
@@ -44,9 +57,12 @@ class MyPublisher(Node):
 		msg.stack_bringup_sz = 8
 		msg.stack_teleop_sz = 40
 		"""
-
+		self.get_logger().info("Publish [{:3d}] --> (is_valid = {}, p = {:.4f})".format(self.count, msg.is_valid, p))
 		self.pub.publish(msg)
-		self.count += 1
+
+		if self.count >= 360 or self.count >= 90 and msg.is_valid == 1:
+			self.get_logger().info('Tester will be stopeed..')
+			raise KeyboardInterrupt
 
 def main(args = None):
 	try:
