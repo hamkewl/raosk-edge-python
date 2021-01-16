@@ -1,3 +1,2 @@
-float32 p_send
-float32 p_receive
-float32 p_intercept
+float32 p_ave_send
+float32 p_ave_receive

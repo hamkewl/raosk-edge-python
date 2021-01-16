@@ -25,8 +25,8 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MemProcMsg.msg"
   "msg/MemParamsMsg.msg"
-  "msg/NetworkProcMsg.msg"
-  "msg/NWParamsMsg.msg"
+  "msg/NwProcMsg.msg"
+  "msg/NwParamsMsg.msg"
   "srv/MemoryModeler.srv"
   "srv/NetworkModeler.srv"
 )

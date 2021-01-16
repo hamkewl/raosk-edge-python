@@ -2,6 +2,5 @@ int32 is_valid
 int32 n_send
 int32 n_receive
 ---
-float32 p_send
-float32 p_receive
-float32 p_intercept
+float32 p_ave_send
+float32 p_ave_receive
