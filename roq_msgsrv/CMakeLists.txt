@@ -23,12 +23,18 @@ find_package(ament_cmake REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
+  # msg files
   "msg/MemProcMsg.msg"
   "msg/MemParamsMsg.msg"
   "msg/NwProcMsg.msg"
   "msg/NwParamsMsg.msg"
+  "msg/CopiedBinaryMsg.msg"
+  "msg/OffloaderResultMsg.msg"
+
+  # srv files
   "srv/MemoryModeler.srv"
   "srv/NetworkModeler.srv"
+  "srv/BinaryReceiver.srv"
 )
 
 if(BUILD_TESTING)
