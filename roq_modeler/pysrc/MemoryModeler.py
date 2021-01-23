@@ -26,7 +26,7 @@ class MemoryModeler(Node):
 	NODENAME = 'mem_modeler'
 	PUBTOPIC = 'mem_params'
 	SUBTOPIC = 'mem_proc'
-	r_INTERVAL = 40
+	r_INTERVAL = 60
 
 	## Instances
 	thread_list = []

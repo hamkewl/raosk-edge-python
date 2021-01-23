@@ -22,7 +22,7 @@ class NetworkModeler(Node):
 	NODENAME = 'nw_modeler'
 	PUBTOPIC = 'nw_params'
 	SUBTOPIC = 'nw_proc'
-	r_INTERVAL = 90
+	r_INTERVAL = 60
 
 	## Instances
 	#thread_list = []
