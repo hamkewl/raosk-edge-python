@@ -30,9 +30,9 @@ class BinaryReceiver(Node):
 		self.get_logger().info('{} done.'.format(self.SELFNODE))
 
 	def write_core(self, core_pid):
-		#dump_dir = '~/core_dumps/'
-		#os.makedirs(dump_dir, exist_ok=True)
-		corename = 'coredump_{}.bin'.format(core_pid)
+		dump_dir = 'core_dumps/'
+		os.makedirs(dump_dir, exist_ok = True)
+		corename = (dump_dir + 'coredump_{}.bin'.format(core_pid))
 		with open(corename, mode = 'wb') as fp:
 			fp.write(self.core_dict[core_pid])
 		self.get_logger().info('pid={}\'s core was dumped to file'.format(core_pid))

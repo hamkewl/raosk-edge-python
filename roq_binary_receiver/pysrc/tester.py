@@ -21,7 +21,7 @@ class MyPublisherBin(Node):
 	send_data = ('abcdefghijklmnopqrstuvwxyz0123456789' * random.randint(50, 5000)).encode()
 	lp = 0
 	rp = 0
-	pid = random.randint(2001, 114514 + 1)
+	pid = random.randint(1998, 2021 + 1)
 
 	def __init__(self):
 		super().__init__(self.SELFNODE)
