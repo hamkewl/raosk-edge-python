@@ -35,8 +35,8 @@ setup(
 	tests_require = ['pytest'],
 	entry_points = {
 		'console_scripts': [
-			'start = pysrc.BinaryReceiver:main',
-			'tester = pysrc.tester:main',
+			'bin_start = src.BinaryReceiver:main',
+			'bin_tester = src.tester:main',
 		],
 	},
 )
