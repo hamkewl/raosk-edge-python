@@ -1,16 +1,14 @@
-int32 is_valid
+int32 vgid
+int8 is_valid
 float32 system
-int32 buffer_sz
-int32 cache_sz
-int32 heap_bringup_sz
-int32 heap_teleop_sz
-int32 stack_bringup_sz
-int32 stack_teleop_sz
+float32 buffer_sz
+float32 cache_sz
+float32 heap_sz
+float32 stack_sz
 ---
+int32 vgid
 float32 p_buffer
 float32 p_cache
-float32 p_heap_bringup
-float32 p_heap_teleop
-float32 p_stack_bringup
-float32 p_stack_teleop
+float32 p_heap
+float32 p_stack
 float32 p_intercept

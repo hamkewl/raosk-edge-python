@@ -27,6 +27,8 @@ class MemoryModeler(Node):
 	PUBTOPIC = 'mem_params'
 	SUBTOPIC = 'mem_proc'
 	r_INTERVAL = 60
+	b_REGVALID = 0.5000
+	f_EXECFIRST = True
 
 	## Instances
 	thread_list = []
@@ -72,17 +74,23 @@ class MemoryModeler(Node):
 
 		## Setting message value
 		predict_params = clf.coef_[0]
+		reg_score = clf.score(dataframe[self.elements_of_X], dataframe[self.element_of_Y[0]])
+
 		self.get_logger().info('--> predict_params: {}'.format(
 			np.round(np.append(clf.coef_[0], clf.intercept_), decimals = 4))
 		)
-		self.p_buffer = predict_params[0]
-		self.p_cache = predict_params[1]
-		self.p_heap = predict_params[2]
-		self.p_stack = predict_params[3]
-		self.p_intercept = clf.intercept_[0]
-		self.get_logger().info('--> clf.score: {:.4f}'.format(
-			clf.score(dataframe[self.elements_of_X], dataframe[self.element_of_Y[0]])
+		self.get_logger().info('--> clf.score: {:.4f} = parameters was {}'.format(
+			reg_score,
+			'changed' if reg_score >= self.b_REGVALID or self.f_EXECFIRST else 'not changed'
 		))
+		if reg_score >= self.b_REGVALID or self.f_EXECFIRST:
+			self.f_EXECFIRST = False
+			self.p_buffer = predict_params[0]
+			self.p_cache = predict_params[1]
+			self.p_heap = predict_params[2]
+			self.p_stack = predict_params[3]
+			self.p_intercept = clf.intercept_[0]
+		
 
 	## callback function when publish message
 	def modeler_pub_callback(self):

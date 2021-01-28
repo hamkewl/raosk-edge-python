@@ -47,10 +47,10 @@ class MyPublisherMem(Node):
 			msg.is_valid = 0
 		
 		msg.system = 60.5000 + random.uniform(0, 4.5000)
-		msg.buffer_sz = 308 + random.randint(-50, 50)
-		msg.cache_sz = 400 + random.randint(-50, 50)
-		msg.heap_sz = 1000 + random.randint(0, 200)
-		msg.stack_sz = 40 + random.randint(0, 40)
+		msg.buffer_sz = 308 + random.uniform(-50, 50)
+		msg.cache_sz = 400 + random.uniform(-50, 50)
+		msg.heap_sz = 1000 + random.uniform(0, 200)
+		msg.stack_sz = 40 + random.uniform(0, 40)
 
 		self.get_logger().info("Publish [{:3d}] --> (is_valid = {}, p = {:.4f})".format(self.count, msg.is_valid, p))
 		self.pub.publish(msg)
