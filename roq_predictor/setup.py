@@ -35,7 +35,7 @@ setup(
 	tests_require = ['pytest'],
 	entry_points = {
 		'console_scripts': [
-			'start = pysrc.Predictor:main',
+			'start = srcs.Predictor:main',
 		],
 	},
 )
