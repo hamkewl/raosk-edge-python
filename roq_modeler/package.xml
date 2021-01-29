@@ -8,7 +8,7 @@
 	<maintainer email="hervtea.midori@gmail.com">hamstick</maintainer>
 	<license>TODO: License declaration</license>
 
-	<exec_depend>roq_messrv</exec_depend>
+	<exec_depend>roq_msgsrv</exec_depend>
 
 	<exec_depend>rclpy</exec_depend>
 	<exec_depend>std_msgs</exec_depend>
