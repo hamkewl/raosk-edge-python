@@ -30,11 +30,13 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/NwParamsMsg.msg"
   "msg/CopiedBinaryMsg.msg"
   "msg/OffloaderResultMsg.msg"
+  "msg/AbortPidsMsg.msg"
 
   # srv files
   "srv/MemoryModeler.srv"
   "srv/NetworkModeler.srv"
   "srv/BinaryReceiver.srv"
+  "srv/Predictor.srv"
 )
 
 if(BUILD_TESTING)
