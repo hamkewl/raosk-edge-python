@@ -50,13 +50,13 @@ class Predictor(Node):
 			MemParamsMsg, 'mem_params', self.sub_memparams_callback, 10
 		)
 		self.sub_nwparam = self.create_subscription(
-			NwParamsMsg, 'net_params', self.sub_netparams_callback, 10
+			NwParamsMsg, 'nw_params', self.sub_netparams_callback, 10
 		)
 		self.sub_memproc = self.create_subscription(
-			MemParamsMsg, 'mem_proc', self.sub_memproc_callback, 10
+			MemProcMsg, 'mem_proc', self.sub_memproc_callback, 10
 		)
 		self.sub_nwproc = self.create_subscription(
-			NwParamsMsg, 'nw_proc', self.sub_netproc_callback, 10
+			NwProcMsg, 'nw_proc', self.sub_netproc_callback, 10
 		)
 	
 	def __del__(self):

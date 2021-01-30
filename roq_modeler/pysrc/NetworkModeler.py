@@ -56,8 +56,8 @@ class NetworkModeler(Node):
 
 	## Create model
 	def create_params(self, ndarray):
-		self.p_ave_send = np.mean(ndarray[:][0])
-		self.p_ave_receive = np.mean(ndarray[:][1])
+		self.p_ave_send = np.mean(ndarray[:, 0])
+		self.p_ave_receive = np.mean(ndarray[:, 1])
 		self.get_logger().info('create_params:  p_ave_send: {:.4f},  p_ave_receive: {:.4f}'.format(
 			self.p_ave_send, self.p_ave_receive
 		))
