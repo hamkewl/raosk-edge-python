@@ -27,6 +27,7 @@ class NetworkModeler(Node):
 	## Instances
 	#thread_list = []
 	#executor = ThreadPoolExecutor(max_workers = 8)
+	exec_time = []
 
 	## Model Parameters
 	#MID = -1
@@ -53,6 +54,9 @@ class NetworkModeler(Node):
 	
 	def __del__(self):
 		self.get_logger().info("{} done.".format(self.NODENAME))
+		print('data size[] = {}, mean([]): {:.6f}, max([]): {:.6f}'.format(
+			len(self.exec_time), np.mean(np.array(self.exec_time)), max(self.exec_time)
+		))
 
 	## Create model
 	def create_params(self, ndarray):
@@ -128,6 +132,7 @@ class NetworkModeler(Node):
 			self.get_logger().warn('Invalid data received.')
 		
 		end = time.time()
+		self.exec_time.append(end - start)
 		self.get_logger().info('nw_data_tuple: {:2d}, valid_flag: {}, raptime: {:.4f}'.format(
 			len(self.nw_data_tuple), valid_flag, end - start)
 		)

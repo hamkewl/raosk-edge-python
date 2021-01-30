@@ -29,6 +29,7 @@ class MemoryModeler(Node):
 	r_INTERVAL = 60
 	b_REGVALID = 0.5000
 	f_EXECFIRST = True
+	exec_time = []
 
 	## Instances
 	thread_list = []
@@ -65,6 +66,9 @@ class MemoryModeler(Node):
 	
 	def __del__(self):
 		self.get_logger().info("{} done.".format(self.NODENAME))
+		print('data size[] = {}, mean([]): {:.6f}, max([]): {:.6f}'.format(
+			len(self.exec_time), np.mean(np.array(self.exec_time)), max(self.exec_time)
+		))
 
 	## Multi Linear Regression @Multi-Threading
 	def regression_part(self, dataframe):
@@ -166,6 +170,7 @@ class MemoryModeler(Node):
 			#raise ValueError
 		
 		end = time.time()
+		self.exec_time.append(end - start)
 		self.get_logger().info('mem_data_block: {:2d}, valid_flag: {}, raptime: {:.4f}'.format(
 			len(self.mem_data_block), valid_flag, end - start)
 		)

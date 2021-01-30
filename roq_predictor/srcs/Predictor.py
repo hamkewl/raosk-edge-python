@@ -24,6 +24,8 @@ class Predictor(Node):
 	## Node & Topic Name
 	NODENAME = 'roq_predictor'
 	PUBTOPIC = 'abort_pids'	# Publish
+	pub_exec_time = []
+	sub_exec_time = []
 
 	## define constant
 	b_MEMORY = 60.
@@ -61,6 +63,12 @@ class Predictor(Node):
 	
 	def __del__(self):
 		self.get_logger().info("{} done.".format(self.NODENAME))
+		print('(Publish)   data size[] = {}, mean([]): {:.6f}, max([]): {:.6f}'.format(
+			len(self.pub_exec_time), np.mean(np.array(self.pub_exec_time)), max(self.pub_exec_time)
+		))
+		print('(Subscribe) data size[] = {}, mean([]): {:.6f}, max([]): {:.6f}'.format(
+			len(self.sub_exec_time), np.mean(np.array(self.sub_exec_time)), max(self.sub_exec_time)
+		))
 
 	## predict Memory utilization and Network Load
 	def predict_load(self):
@@ -117,6 +125,7 @@ class Predictor(Node):
 			))
 
 		end = time.time()
+		self.pub_exec_time.append(end - start)
 		self.get_logger().info('Publish: raptime: {:.4f}'.format(end - start))
 	
 	## callback function when subscribe message
@@ -131,6 +140,7 @@ class Predictor(Node):
 		self.mem_params.p_intercept = msg.p_intercept
 
 		end = time.time()
+		self.sub_exec_time.append(end - start)
 		self.get_logger().info('MemParams: raptime: {:.4f}'.format(end - start))
 	
 	def sub_netparams_callback(self, msg):
@@ -140,6 +150,7 @@ class Predictor(Node):
 		self.net_params.p_ave_receive = msg.p_ave_receive
 
 		end = time.time()
+		self.sub_exec_time.append(end - start)
 		self.get_logger().info('NwParams: raptime: {:.4f}'.format(end - start))
 
 	def sub_memproc_callback(self, msg):
@@ -152,6 +163,7 @@ class Predictor(Node):
 		self.mem_data.stack_sz = msg.stack_sz
 
 		end = time.time()
+		self.sub_exec_time.append(end - start)
 		self.get_logger().info('MemProc: raptime: {:.4f}'.format(end - start))
 	
 	def sub_netproc_callback(self, msg):
@@ -161,6 +173,7 @@ class Predictor(Node):
 		self.net_data.n_receive = msg.n_receive
 
 		end = time.time()
+		self.sub_exec_time.append(end - start)
 		self.get_logger().info('NwProc: raptime: {:.4f}'.format(end - start))
 
 
