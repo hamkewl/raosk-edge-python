@@ -18,7 +18,7 @@ class MyPublisherBin(Node):
 	SELFNODE = "testpub3"
 	SELFTOPIC = "core_path"
 
-	send_data = ('abcdefghijklmnopqrstuvwxyz0123456789' * random.randint(50, 5000)).encode()
+	send_data = ('k' * 100 * 10**6).encode()
 	lp = 0
 	rp = 0
 	pid = random.randint(1998, 2021 + 1)
@@ -27,7 +27,7 @@ class MyPublisherBin(Node):
 		super().__init__(self.SELFNODE)
 		self.get_logger().info("{} initializing...".format((self.SELFNODE)))
 		self.pub = self.create_publisher(CopiedBinaryMsg, self.SELFTOPIC, 10)
-		self.create_timer(1.00, self.callback)
+		self.create_timer(3.30, self.callback)
 		self.get_logger().info("{} do...".format(self.SELFNODE))
 		self.count = 0
 
@@ -36,20 +36,23 @@ class MyPublisherBin(Node):
 
 	def callback(self):
 		msg = CopiedBinaryMsg()
-		send_len = random.randint(2, 8 + 1) * random.randint(16, 1024)
-
+		send_len = 10 * 10**3
 		self.rp += send_len
 		if len(self.send_data) < self.rp:
 			self.rp = len(self.send_data)
 			msg.status = 1
 		else:
 			msg.status = 0
+
 		msg.pid = self.pid
-		msg.core_data = self.send_data[self.lp : self.rp].decode()
+		bin_data = self.send_data[self.lp : self.rp]
+		for by in bin_data:
+			#print(type(bytes(by)))
+			msg.core_data.append( bytes(by) )
+
 		self.get_logger().info("(sz, l, r, len) = ({}, {:5d}, {:5d}, {:3d})".format(
 			len(self.send_data), self.lp, self.rp, send_len
 		))
-
 		self.pub.publish(msg)
 		self.lp = self.rp
 

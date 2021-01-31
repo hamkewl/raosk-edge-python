@@ -8,6 +8,7 @@
 # -----------------------------------------------
 
 import os
+import time
 
 import rclpy
 from rclpy.node import Node
@@ -32,7 +33,7 @@ class BinaryReceiver(Node):
 	def write_core(self, core_pid):
 		dump_dir = 'core_dumps/'
 		os.makedirs(dump_dir, exist_ok = True)
-		corename = (dump_dir + 'coredump_{}.bin'.format(core_pid))
+		corename = (dump_dir + 'core.{}.bin'.format(core_pid))
 		with open(corename, mode = 'wb') as fp:
 			fp.write(self.core_dict[core_pid])
 		self.get_logger().info('pid={}\'s core was dumped to file'.format(core_pid))
@@ -46,11 +47,14 @@ class BinaryReceiver(Node):
 			- 1: final binary data
 			- 2: NG
 		"""
+		start = time.time()
 		if message.status <= 1:
 			if message.pid in self.core_dict:
-				self.core_dict[message.pid] += (message.core_data).encode()
+				for by in message.core_data:
+					self.core_dict[message.pid] += by
 			else:
-				self.core_dict[message.pid] = (message.core_data).encode()
+				for by in message.core_data:
+					self.core_dict[message.pid] = by
 			
 			self.get_logger().info('binary data received: size: {}, core-size: {}'.format(
 				len(message.core_data), len(self.core_dict[message.pid]))
@@ -58,6 +62,8 @@ class BinaryReceiver(Node):
 			if message.status == 1:
 				self.write_core(message.pid)
 				self.core_dict[message.pid] = b''
+		end = time.time()
+		self.get_logger().info('rap-time: {:.4f}'.format(end - start))
 	
 
 def main(args = None):
