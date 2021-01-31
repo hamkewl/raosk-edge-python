@@ -28,7 +28,7 @@ class Predictor(Node):
 	sub_exec_time = []
 
 	## define constant
-	b_MEMORY = 37.25
+	b_MEMORY = 40.
 	b_NETWORK = 0.
 
 	## Model Parameters stores
