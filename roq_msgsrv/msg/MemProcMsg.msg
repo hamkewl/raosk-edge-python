@@ -1,4 +1,5 @@
 int32 vgid
+int32[] childs
 int8 is_valid
 float32 system
 float32 buffer_sz

@@ -1,3 +1,3 @@
 int8 status
 int32 pid
-string core_data
+byte[] core_data
