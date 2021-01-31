@@ -28,7 +28,7 @@ class Predictor(Node):
 	sub_exec_time = []
 
 	## define constant
-	b_MEMORY = 60.
+	b_MEMORY = 37.25
 	b_NETWORK = 0.
 
 	## Model Parameters stores
@@ -112,13 +112,18 @@ class Predictor(Node):
 		if predicted_memory >= self.b_MEMORY and N_load <= self.b_NETWORK and self.mem_data.vgid > 0:
 			## Message setting
 			msg = AbortPidsMsg()
-			msg.abort_pid = self.mem_data.vgid
+
+			msg.vgid = self.mem_data.vgid
+			msg.abort_pid.append(self.mem_data.vgid)
+			for p in self.mem_data.childs:
+				msg.abort_pid.append(p)
 
 			## Send message
 			self.pub.publish(msg)
 			self.get_logger().info("abort_pid: {}  (caused: memory = {:.4f}, N_load = {:.4f})".format(
-				msg.abort_pid, predicted_memory, N_load
+				msg.abort_pid[:], predicted_memory, N_load
 			))
+			self.mem_data = includes.MemProc.MemProc()	# mem_dataのデータを初期化
 		else:
 			self.get_logger().info("No process was aborted (caused: memory = {:.4f}, N_load = {:.4f})".format(
 				predicted_memory, N_load
@@ -128,6 +133,7 @@ class Predictor(Node):
 		self.pub_exec_time.append(end - start)
 		self.get_logger().info('Publish: raptime: {:.4f}'.format(end - start))
 	
+
 	## callback function when subscribe message
 	def sub_memparams_callback(self, msg):
 		start = time.time()
@@ -157,6 +163,7 @@ class Predictor(Node):
 		start = time.time()
 		
 		self.mem_data.vgid = msg.vgid
+		self.mem_data.childs = msg.childs
 		self.mem_data.buffer_sz = msg.buffer_sz
 		self.mem_data.cache_sz = msg.cache_sz
 		self.mem_data.heap_sz = msg.heap_sz

@@ -1,5 +1,6 @@
 class MemParams:
 	vgid = -1
+	childs = []
 	p_buffer = 0.
 	p_cache = 0.
 	p_heap = 0.

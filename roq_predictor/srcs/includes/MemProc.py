@@ -1,5 +1,6 @@
 class MemProc:
 	vgid = -1
+	childs = []
 	buffer_sz = 0.
 	cache_sz = 0.
 	heap_sz = 0.
