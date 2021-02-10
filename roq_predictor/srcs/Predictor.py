@@ -92,7 +92,7 @@ class Predictor(Node):
     
     try:
       b_2 = (self.net_data.n_send + self.net_data.n_receive) \
-            * min(self.net_params.p_ave_send, self.net_params.p_ave_receive) / self.net_params.p_ave_receiver
+            * min(self.net_params.p_ave_send, self.net_params.p_ave_receive) / self.net_params.p_ave_receive
     except ZeroDivisionError:
       b_2 = 1.
     
