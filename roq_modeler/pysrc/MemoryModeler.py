@@ -66,10 +66,10 @@ class MemoryModeler(Node):
 	
 	def __del__(self):
 		self.get_logger().info("{} done.".format(self.NODENAME))
-		print('data size[] = {}, mean([]): {:.6f}, max([]): {:.6f}'.format(
-			len(self.exec_time), np.mean(np.array(self.exec_time)), max(self.exec_time)
+		npa = np.array(self.exec_time)
+		print('(Publish)   data size[] = {}, mean([]): {:.6f}, min([]): {:.6f}, max([]): {:.6f}, std([]): {:.6f}'.format(
+			len(npa), np.mean(npa), np.min(npa), np.max(npa), np.std(npa)
 		))
-
 	## Multi Linear Regression @Multi-Threading
 	def regression_part(self, dataframe):
 		#self.get_logger().info('into REG')

@@ -9,10 +9,13 @@
 
 import os
 import time
+import numpy as np
 
 import rclpy
 from rclpy.node import Node
 from roq_msgsrv.msg import CopiedBinaryMsg
+
+import pprint
 
 class BinaryReceiver(Node):
 	SELFNODE = 'bin_receiver'
@@ -20,6 +23,8 @@ class BinaryReceiver(Node):
 
 	## core file
 	core_dict = {}
+	evaluate_time = {}
+	exec_time = []
 
 	def __init__(self):
 		super().__init__(self.SELFNODE)
@@ -28,15 +33,27 @@ class BinaryReceiver(Node):
 		self.get_logger().info('{} do...'.format(self.SELFNODE))
 	
 	def __del__(self):
+		for key in self.evaluate_time:
+			logs = open('binary_receive_detaild_{}.log'.format(key), 'w')
+			logs.write('PID-{},{},{}\n'.format(key, len(self.evaluate_time[key]) ,self.evaluate_time[key]))
+		
+		npa = np.array(self.exec_time)
+		print('(Publish)   data size[] = {}, mean([]): {:.6f}, min([]): {:.6f}, max([]): {:.6f}, std([]): {:.6f}'.format(
+			len(npa), np.mean(npa), np.min(npa), np.max(npa), np.std(npa)
+		))
+		
 		self.get_logger().info('{} done.'.format(self.SELFNODE))
+		logs.close()
 
 	def write_core(self, core_pid):
 		dump_dir = 'core_dumps/'
 		os.makedirs(dump_dir, exist_ok = True)
 		corename = (dump_dir + 'core.{}.bin'.format(core_pid))
+		print(self.core_dict[core_pid], type(self.core_dict[core_pid]))
 		with open(corename, mode = 'wb') as fp:
 			fp.write(self.core_dict[core_pid])
 		self.get_logger().info('pid={}\'s core was dumped to file'.format(core_pid))
+		pprint.pprint(self.evaluate_time)
 	
 	def sub_callback(self, message):
 		"""
@@ -47,6 +64,8 @@ class BinaryReceiver(Node):
 			- 1: final binary data
 			- 2: NG
 		"""
+		#pprint.pprint(self.core_dict)
+
 		start = time.time()
 		if message.status <= 1:
 			if message.pid in self.core_dict:
@@ -63,8 +82,17 @@ class BinaryReceiver(Node):
 				self.write_core(message.pid)
 				self.core_dict[message.pid] = b''
 		end = time.time()
+
+		## eveluation
+		if message.pid in self.evaluate_time:
+			self.evaluate_time[message.pid].append(end - start)
+		else:
+			self.evaluate_time[message.pid] = []
+			self.evaluate_time[message.pid].append(end - start)
+
 		self.get_logger().info('rap-time: {:.4f}'.format(end - start))
-	
+		self.exec_time.append(end - start)
+
 
 def main(args = None):
 	rclpy.init(args = args)

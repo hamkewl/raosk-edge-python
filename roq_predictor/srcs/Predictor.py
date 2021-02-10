@@ -28,7 +28,7 @@ class Predictor(Node):
 	sub_exec_time = []
 
 	## define constant
-	b_MEMORY = 40.
+	b_MEMORY = 35.7
 	b_NETWORK = 0.
 
 	## Model Parameters stores
@@ -63,11 +63,14 @@ class Predictor(Node):
 	
 	def __del__(self):
 		self.get_logger().info("{} done.".format(self.NODENAME))
-		print('(Publish)   data size[] = {}, mean([]): {:.6f}, max([]): {:.6f}'.format(
-			len(self.pub_exec_time), np.mean(np.array(self.pub_exec_time)), max(self.pub_exec_time)
+
+		npa = np.array(self.pub_exec_time)
+		print('(Publish)   data size[] = {}, mean([]): {:.6f}, min([]): {:.6f}, max([]): {:.6f}, std([]): {:.6f}'.format(
+			len(npa), np.mean(npa), np.min(npa), np.max(npa), np.std(npa)
 		))
-		print('(Subscribe) data size[] = {}, mean([]): {:.6f}, max([]): {:.6f}'.format(
-			len(self.sub_exec_time), np.mean(np.array(self.sub_exec_time)), max(self.sub_exec_time)
+		npb = np.array(self.sub_exec_time)
+		print('(Subscribe) data size[] = {}, mean([]): {:.6f}, min([]): {:.6f}, max([]): {:.6f}, std([]): {:.6f}'.format(
+			len(npb), np.mean(npb), np.min(npb), np.max(npb), np.std(npb)
 		))
 
 	## predict Memory utilization and Network Load
