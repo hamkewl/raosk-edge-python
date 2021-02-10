@@ -7,7 +7,7 @@
 ## Requirements
 import time
 import numpy as np
-import Includes
+from . import includes
 
 ## ROS2
 import rclpy
@@ -32,12 +32,12 @@ class Predictor(Node):
   b_NETWORK = 0.
 
   ## Model Parameters stores
-  mem_params = Includes.MemParams()
-  net_params = Includes.NwParams()
+  mem_params = includes.MemParams()
+  net_params = includes.NwParams()
 
   ## real-time data
-  mem_data = Includes.MemProc()
-  net_data = Includes.NwProc()
+  mem_data = includes.MemProc()
+  net_data = includes.NwProc()
 
   def __init__(self):
     super().__init__(self.NODENAME)
@@ -127,7 +127,7 @@ class Predictor(Node):
       self.get_logger().info("abort_pid: {}  (caused: memory = {:.4f}, N_load = {:.4f})".format(
         msg.abort_pid[:], predicted_memory, N_load
       ))
-      self.mem_data = Includes.MemProc()	# Reinitialize mem_data
+      self.mem_data = includes.MemProc()	# Reinitialize mem_data
     else:
       self.get_logger().info("No process was aborted (caused: memory = {:.4f}, N_load = {:.4f})".format(
         predicted_memory, N_load

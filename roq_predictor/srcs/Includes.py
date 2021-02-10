@@ -1,5 +1,5 @@
 # =============================
-# Includes.py
+# includes.py
 # @discription	Class file for Predictor.py
 # @Author				Koki Nagahama (@hamstick)
 # =============================
