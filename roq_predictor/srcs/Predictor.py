@@ -6,7 +6,7 @@
 
 ## Requirements
 import time
-import Includes
+from . import includes
 
 ## ROS2
 import rclpy
@@ -29,12 +29,12 @@ class Predictor(Node):
   b_NETWORK = 0.
 
   ## Model Parameters stores
-  mem_params = Includes.MemParams()
-  net_params = Includes.NwParams()
+  mem_params = includes.MemParams()
+  net_params = includes.NwParams()
 
   ## real-time data
-  mem_data = Includes.MemProc()
-  net_data = Includes.NwProc()
+  mem_data = includes.MemProc()
+  net_data = includes.NwProc()
 
   def __init__(self):
     super().__init__(self.NODENAME)
@@ -109,7 +109,7 @@ class Predictor(Node):
       ## Send message
       self.pub.publish(msg)
       self.get_logger().info("memory: {:.4f}, N_load: {:.4f} -> Aborted)".format(predicted_memory, N_load))
-      self.mem_data = Includes.MemProc()	# Initialize mem_data
+      self.mem_data = includes.MemProc()	# Initialize mem_data
     else:
       self.get_logger().info("memory: {:.4f}, N_load: {:.4f}".format(predicted_memory, N_load))
 

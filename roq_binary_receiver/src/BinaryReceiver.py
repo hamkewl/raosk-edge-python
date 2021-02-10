@@ -24,7 +24,7 @@ class BinaryReceiver(Node):
 
   def __init__(self):
     super().__init__(self.SELFNODE)
-     self.get_logger().info('{} initializing...'.format(self.SELFNODE))
+    self.get_logger().info('{} initializing...'.format(self.SELFNODE))
     self.sub = self.create_subscription(CopiedBinaryMsg, self.SELFTOPIC, self.sub_callback, 10)
     self.get_logger().info('{} do...'.format(self.SELFNODE))
   
