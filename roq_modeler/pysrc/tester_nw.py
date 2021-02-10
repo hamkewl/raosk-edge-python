@@ -1,11 +1,8 @@
-#!/usr/bin/env /usr/bin/python3
-# -*- coding: utf-8 -*-
-# -----------------------------------------------
-# ROS2 Node 送信側
-#
-# The MIT License (MIT)
-# Copyright (C) 2019 myasu.
-# -----------------------------------------------
+# =============================
+# tester_nw.py
+# @discription  Python blog for testing NetworkModeler.py
+# @Author       Koki Nagahama (@hamstick)
+# =============================
 
 import os
 
