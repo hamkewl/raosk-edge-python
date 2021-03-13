@@ -19,8 +19,8 @@ setup(
   zip_safe = True,
   author = 'Koki Nagahama',
   author_email = 'hamstick.devel@gmail.com',
-  maintainer = 'dolyLab',
-  maintainer_email = 'ubuntu@todo.todo',
+  maintainer = 'dolyLab.',
+  maintainer_email = 'doly@shibaura-it.ac.jp',
   keywords = ['ROS'],
   classifiers = [
     'Intended Audience :: Developers',
