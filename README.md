@@ -3,7 +3,7 @@ Python code for the program that runs on the edge that I'm trying to implement i
 
 ## What is RAOSK?
 RAOSK (Robotics Application Offloader Syetem on Kubernetes) は，hamstick (@hamstick, Koki Nagahama) がロボットアプリケーション研究の一環で開発し，動くように稼働したROSノードです．  
-なお，本レポジトリに上がっているソースコードはシステム全体の機能においてはまだ未完了です．詳細はIssue #1 #3 をご確認ください．
+なお，本レポジトリに上がっているソースコードはシステム全体の機能においてはまだ未完了です．詳細はIssue [#1](https://github.com/hamstick/raosk-edge-python/issues/1) [#3](https://github.com/hamstick/raosk-edge-python/issues/3) をご確認ください．
 
 ![RAOSK](readme_imgs/systemflow.png)
 
@@ -29,5 +29,5 @@ $ ros2 run raosk_modeler mem_start
 プログラム中で `KeyboardInterrupt` をスルーするように書いています
 
 ## Problem
-Written in issue #3
+Written in issue [#3](https://github.com/hamstick/raosk-edge-python/issues/3)  
 3/24ぐらいまでは作業する予定なのでソースコードに関してはそれまでノータッチでお願いします．
