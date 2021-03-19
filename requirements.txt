@@ -1,0 +1,11 @@
+### requirements.txt
+###  in raosk-edge-python
+### @Author Koki Nagahama
+
+## python libs
+numpy
+scipy
+psutil
+pandas
+sklearn
+scikit-learn
