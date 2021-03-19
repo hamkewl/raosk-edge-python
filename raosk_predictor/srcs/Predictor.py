@@ -72,6 +72,9 @@ class Predictor(Node):
       + self.mem_params.p_stack * self.mem_data.stack_sz
     
     # Network
+    N_load = -1.  ## 改善中のためいったん無効化
+    """
+    ## 旧ネットワーク予測モデル
     try:
       b_1 = (self.net_data.n_send + self.net_data.n_receive) \
             * min(self.net_params.p_ave_send, self.net_params.p_ave_receive) / self.net_params.p_ave_send
@@ -87,6 +90,7 @@ class Predictor(Node):
       N_load = \
         b_1 * (self.net_data.n_send - self.net_params.p_ave_send) \
         - b_2 * (self.net_data.n_receive - self.net_params.p_ave_receive)
+    """
     
     return predicted_memory, N_load
   
