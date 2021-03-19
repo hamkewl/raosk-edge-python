@@ -16,10 +16,15 @@ $ source [workspace_path]/install/setup.bash
 ```
 
 ## How to Use
+同梱のrequirements.txtには実行に必要なパッケージが含まれているため，初回実行前に必ず下記を行ってください  
+```
+$ pip install -r requirements.txt
+```
+
+ROS1とは異なり，setup.pyで設定される起動コマンドになります  
 ```
 $ ros2 run [package_name] [exec_node]
 ```
-ROS1とは異なり，setup.pyで設定される起動コマンドになります  
 
 **ex.** raosk_modelerパッケージのMemoryModelerを起動したい場合
 ```
